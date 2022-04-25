@@ -26,39 +26,27 @@ namespace MeetMVC.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string Username { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            [Display(Name = "Sexuality")]
+            public string Sexuality { get; set; }
+            public string Gender { get; set; }
+            public string City { get; set; }
+            public string Country { get; set; }
+            public string Age { get; set; }
+            public string About { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -70,7 +58,13 @@ namespace MeetMVC.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                Sexuality = user.sexuality,
+                Gender = user.gender,
+                City = user.city,
+                Country = user.country,
+                Age = user.age,
+                About = user.about
             };
         }
 
@@ -109,6 +103,42 @@ namespace MeetMVC.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+            }
+
+            if (Input.Sexuality != "")
+            {
+                user.sexuality = Input.Sexuality;
+                await _userManager.UpdateAsync(user);
+            }
+
+            if (Input.Gender != "")
+            {
+                user.gender = Input.Gender;
+                await _userManager.UpdateAsync(user);
+            }
+
+            if (Input.City != "")
+            {
+                user.city = Input.City;
+                await _userManager.UpdateAsync(user);
+            }
+
+            if (Input.Country != "")
+            {
+                user.country = Input.Country;
+                await _userManager.UpdateAsync(user);
+            }
+
+            if (Input.Age != "")
+            {
+                user.age = Input.Age;
+                await _userManager.UpdateAsync(user);
+            }
+
+            if (Input.About != "")
+            {
+                user.about = Input.About;
+                await _userManager.UpdateAsync(user);
             }
 
             await _signInManager.RefreshSignInAsync(user);
