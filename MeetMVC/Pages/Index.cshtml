@@ -1,0 +1,24 @@
+﻿@page
+@model IndexModel
+@{ ViewData["Title"] = "Home page"; }
+
+<div class="container">
+    <div class='row'>
+        @{ 
+            
+            foreach (var item in Model.Users)
+            {
+    <div class="card" style="width: 18rem;">
+        <img class="card-img-top" src="~/images/avatar-male.jpg" alt="@item.UserName">
+        <div class="card-body">
+            <h5 class="card-title">@item.firstName</h5>
+            <p class="card-text">@item.about</p>
+            <a href="#" class="btn btn-primary">Visit profile</a>
+        </div>
+    </div> } }
+
+    </div>
+</div>
+<p>
+    @ViewBag.userid
+</p>
