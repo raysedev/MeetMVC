@@ -5,6 +5,7 @@ using Owin;
 using Microsoft.Owin;
 using MeetMVC.Infrastructure;
 using MeetMVC.Services;
+using MeetMVC.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection");
@@ -32,8 +33,16 @@ builder.Services.AddRazorPages();
 builder.Services.AddRazorPages();*/
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
+
+app.UseRouting();
+
+/*app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<ChatHub>("/chatter");
+});*/
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
