@@ -24,6 +24,7 @@ namespace MeetMVC.Pages
         [BindProperty]
         public InputModel Input { get; set; }
 
+        public string ImagePath { get; set; }
         public string ReturnUrl { get; set; }
         public List<ApplicationUser> Users { get; set; }
 

@@ -16,7 +16,6 @@ namespace MeetMVC.Services
 
         public async void UploadImage(IFormFile file)
         {
-            Console.WriteLine("AAAAAAAAAAAAAAAAAAAA SHMATKIIII: " + file.Length);
             long totalBytes = file.Length;
             string fileName = file.FileName.Trim('"');
             fileName = EnsureFileName(fileName);

@@ -9,11 +9,11 @@
             foreach (var item in Model.Users)
             {
     <div class="card" style="width: 18rem;">
-        <img class="card-img-top" src="~/images/avatar-male.jpg" alt="@item.UserName">
+        <img class="card-img-top" src="/uploads/@item.ImagePath" alt="@item.UserName">
         <div class="card-body">
             <h5 class="card-title">@item.FirstName</h5>
             <p class="card-text">@item.About</p>
-            <a href="#" class="btn btn-primary">Visit profile</a>
+            <a class="btn btn-primary" asp-page="/Home/User">Visit profile</a>
         </div>
     </div> } }
 

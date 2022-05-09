@@ -18,11 +18,13 @@ namespace MeetMVC.Pages
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            Users = new List<ApplicationUser>();
         }
 
         public string Username { get; set; }
-
+        public List<ApplicationUser> Users { get; set; }
         public string Email { get; set; }
+        public string PageId { get; set; }
 
         [TempData]
         public string StatusMessage { get; set; }
@@ -41,8 +43,13 @@ namespace MeetMVC.Pages
             Email = email;
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(string id)
         {
+            /*foreach (var item in Users)
+            {
+                
+            }*/
+            PageId = id;
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
