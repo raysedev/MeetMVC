@@ -10,6 +10,8 @@ using MeetMVC.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Hosting;
+using MeetMVC.Infrastructure;
 
 namespace MeetMVC.Areas.Identity.Pages.Account.Manage
 {
@@ -17,16 +19,20 @@ namespace MeetMVC.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IUnitOfWork _unitOfWork;
 
         public IndexModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _unitOfWork = unitOfWork;
         }
 
         public string Username { get; set; }
+        public string ImagePath { get; set; }
 
         [TempData]
         public string StatusMessage { get; set; }
@@ -59,12 +65,12 @@ namespace MeetMVC.Areas.Identity.Pages.Account.Manage
             Input = new InputModel
             {
                 PhoneNumber = phoneNumber,
-                Sexuality = user.sexuality,
-                Gender = user.gender,
-                City = user.city,
-                Country = user.country,
-                Age = user.age,
-                About = user.about
+                Sexuality = user.Sexuality,
+                Gender = user.Gender,
+                City = user.City,
+                Country = user.Country,
+                Age = user.Age,
+                About = user.About
             };
         }
 
@@ -76,13 +82,17 @@ namespace MeetMVC.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
+            ImagePath = user.ImagePath;
+
             await LoadAsync(user);
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(IFormFile file)
         {
+
             var user = await _userManager.GetUserAsync(User);
+
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
@@ -90,6 +100,7 @@ namespace MeetMVC.Areas.Identity.Pages.Account.Manage
 
             if (!ModelState.IsValid)
             {
+                _unitOfWork.UploadImage(file);
                 await LoadAsync(user);
                 return Page();
             }
@@ -107,37 +118,37 @@ namespace MeetMVC.Areas.Identity.Pages.Account.Manage
 
             if (Input.Sexuality != "")
             {
-                user.sexuality = Input.Sexuality;
+                user.Sexuality = Input.Sexuality;
                 await _userManager.UpdateAsync(user);
             }
 
             if (Input.Gender != "")
             {
-                user.gender = Input.Gender;
+                user.Gender = Input.Gender;
                 await _userManager.UpdateAsync(user);
             }
 
             if (Input.City != "")
             {
-                user.city = Input.City;
+                user.City = Input.City;
                 await _userManager.UpdateAsync(user);
             }
 
             if (Input.Country != "")
             {
-                user.country = Input.Country;
+                user.Country = Input.Country;
                 await _userManager.UpdateAsync(user);
             }
 
             if (Input.Age != "")
             {
-                user.age = Input.Age;
+                user.Age = Input.Age;
                 await _userManager.UpdateAsync(user);
             }
 
             if (Input.About != "")
             {
-                user.about = Input.About;
+                user.About = Input.About;
                 await _userManager.UpdateAsync(user);
             }
 

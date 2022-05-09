@@ -11,6 +11,7 @@ using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using MeetMVC.Data;
+using MeetMVC.Infrastructure;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -24,6 +25,7 @@ namespace MeetMVC.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
     {
+        private readonly IUnitOfWork _unitOfWork;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserStore<ApplicationUser> _userStore;
@@ -36,8 +38,10 @@ namespace MeetMVC.Areas.Identity.Pages.Account
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
             _userStore = userStore;
             _emailStore = GetEmailStore();
@@ -71,6 +75,8 @@ namespace MeetMVC.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
+            public string ImagePath { get; set; }
+
             [Required]
             [Display(Name = "First Name")]
             public string FirstName { get; set; }
@@ -140,14 +146,15 @@ namespace MeetMVC.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
-        public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+        public async Task<IActionResult> OnPostAsync(IFormFile file, string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
+                _unitOfWork.UploadImage(file);
                 //var user = CreateUser();
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, firstName = Input.FirstName, lastName = Input.LastName, age = Input.Age, sexuality = Input.Sexuality, gender = Input.Gender, city = Input.City, country = Input.Country, about = Input.About, lookingFor = Input.LookingFor };
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, FirstName = Input.FirstName, LastName = Input.LastName, Age = Input.Age, Sexuality = Input.Sexuality, Gender = Input.Gender, City = Input.City, Country = Input.Country, About = Input.About, LookingFor = Input.LookingFor, ImagePath = file.FileName };
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);

@@ -46,16 +46,16 @@ namespace MeetMVC.Pages
 
         public async Task LoadAsync(ApplicationUser user)
         {
-            string interestedGenders = user.lookingFor;
+            string interestedGenders = user.LookingFor;
             Users = await _userManager.Users
-                .Where(item => interestedGenders.Contains(item.gender))
+                .Where(item => interestedGenders.Contains(item.Gender))
                 .ToListAsync();
 
 
 
             Input = new InputModel
             {
-                Sexuality = user.sexuality
+                Sexuality = user.Sexuality
             };
         }
 
@@ -93,7 +93,7 @@ namespace MeetMVC.Pages
 
             if (Input.Sexuality != "")
             {
-                user.sexuality = Input.Sexuality;
+                user.Sexuality = Input.Sexuality;
                 await _userManager.UpdateAsync(user);
             }
 

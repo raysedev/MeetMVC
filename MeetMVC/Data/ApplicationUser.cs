@@ -4,14 +4,15 @@ namespace MeetMVC.Data
 {
     public class ApplicationUser : IdentityUser
     {
-        public string firstName { get; set; }
-        public string lastName { get; set; }
-        public string age { get; set; }
-        public string about { get; set; }
-        public string lookingFor { get; set; }
-        public string city { get; set; }
-        public string country { get; set; }
-        public string gender { get; set; }
-        public string sexuality { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Age { get; set; }
+        public string About { get; set; }
+        public string LookingFor { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
+        public string Gender { get; set; }
+        public string Sexuality { get; set; }
+        public string ImagePath { get; set; }
     }
 }
