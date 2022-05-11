@@ -1,8 +1,10 @@
 using MeetMVC.Data;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using System.Text;
 
 namespace MeetMVC.Pages
@@ -11,56 +13,74 @@ namespace MeetMVC.Pages
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-
+        [ActivatorUtilitiesConstructorAttribute]
         public UserModel(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+        UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             Users = new List<ApplicationUser>();
         }
 
-        public string Username { get; set; }
+        [BindProperty]
+        public InputModel Input { get; set; }
+        public string UserId { get; set; }
+        public string ImagePath { get; set; }
+        public string ReturnUrl { get; set; }
         public List<ApplicationUser> Users { get; set; }
-        public string Email { get; set; }
-        public string PageId { get; set; }
+
+        public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
         [TempData]
         public string StatusMessage { get; set; }
 
-        [BindProperty]
-        public InputModel Input { get; set; }
-
         public class InputModel
         {
-
+            public string Sexuality { get; set; }
         }
 
-        private async Task LoadAsync(ApplicationUser user)
+        private readonly ILogger<IndexModel> _logger;
+
+        public UserModel(ILogger<IndexModel> logger)
         {
-            var email = await _userManager.GetEmailAsync(user);
-            Email = email;
+            _logger = logger;
+        }
+
+        public async Task LoadAsync(ApplicationUser user)
+        {
+            string interestedGenders = user.LookingFor;
+            Users = await _userManager.Users
+                .Where(item => interestedGenders.Contains(item.Gender))
+                .ToListAsync();
+
+
+
+            Input = new InputModel
+            {
+                Sexuality = user.Sexuality
+            };
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
         {
-            /*foreach (var item in Users)
-            {
-                
-            }*/
-            PageId = id;
+            UserId = id;
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            if (user != null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                await LoadAsync(user);
+            }
+            else
+            {
+
+                Users = await _userManager.Users.OrderBy(item => Guid.NewGuid()).Take(10).ToListAsync();
+
             }
 
-            await LoadAsync(user);
             return Page();
         }
 
-        public async Task<IActionResult> OnPostChangeEmailAsync()
+        public async Task<IActionResult> OnPostAsync()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -74,35 +94,14 @@ namespace MeetMVC.Pages
                 return Page();
             }
 
-            var email = await _userManager.GetEmailAsync(user);
-            return Page();
-        }
-
-        public async Task<IActionResult> OnPostSendVerificationEmailAsync()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            if (Input.Sexuality != "")
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                user.Sexuality = Input.Sexuality;
+                await _userManager.UpdateAsync(user);
             }
 
-            if (!ModelState.IsValid)
-            {
-                await LoadAsync(user);
-                return Page();
-            }
-
-            var userId = await _userManager.GetUserIdAsync(user);
-            var email = await _userManager.GetEmailAsync(user);
-            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            var callbackUrl = Url.Page(
-                "/Account/ConfirmEmail",
-                pageHandler: null,
-                values: new { area = "Identity", userId = userId, code = code },
-                protocol: Request.Scheme);
-
-            StatusMessage = "Verification email sent. Please check your email.";
+            await _signInManager.RefreshSignInAsync(user);
+            StatusMessage = "Your profile has been updated";
             return RedirectToPage();
         }
     }

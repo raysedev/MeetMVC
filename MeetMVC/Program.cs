@@ -6,6 +6,7 @@ using Microsoft.Owin;
 using MeetMVC.Infrastructure;
 using MeetMVC.Services;
 using MeetMVC.Hubs;
+using Microsoft.EntityFrameworkCore.SqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection");
@@ -18,8 +19,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Add services to the container.
 connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<ApplicationDbContext>(options => {
+    options.UseSqlServer(connectionString);
+    options.UseLazyLoadingProxies();
+    });
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)

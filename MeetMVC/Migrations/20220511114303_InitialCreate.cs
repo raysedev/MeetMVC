@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MeetMVC.Migrations
 {
-    public partial class customFields : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -28,15 +28,16 @@ namespace MeetMVC.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    firstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    lastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    age = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    about = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    lookingFor = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    city = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    country = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    sexuality = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Age = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    About = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LookingFor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Sexuality = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -163,6 +164,25 @@ namespace MeetMVC.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Interests",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Interests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Interests_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -201,6 +221,11 @@ namespace MeetMVC.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Interests_ApplicationUserId",
+                table: "Interests",
+                column: "ApplicationUserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -219,6 +244,9 @@ namespace MeetMVC.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Interests");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

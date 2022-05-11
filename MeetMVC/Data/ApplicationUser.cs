@@ -4,6 +4,11 @@ namespace MeetMVC.Data
 {
     public class ApplicationUser : IdentityUser
     {
+
+        public ApplicationUser() {
+            Interests = new List<Interest>();
+        }
+
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Age { get; set; }
@@ -14,5 +19,7 @@ namespace MeetMVC.Data
         public string Gender { get; set; }
         public string Sexuality { get; set; }
         public string ImagePath { get; set; }
+
+        public virtual List<Interest> Interests { get; set; }
     }
 }

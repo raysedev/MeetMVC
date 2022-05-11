@@ -9,5 +9,7 @@ namespace MeetMVC.Data
             : base(options)
         {
         }
+
+        public DbSet<Interest> Interests { get; set; }
     }
 }
