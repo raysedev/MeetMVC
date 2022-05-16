@@ -40,13 +40,6 @@ builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-app.UseRouting();
-
-/*app.UseEndpoints(endpoints =>
-{
-    endpoints.MapHub<ChatHub>("/chatter");
-});*/
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -63,10 +56,20 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+
+    endpoints.MapHub<ChatHub>("/chatHub");
+});
 
 app.Run();

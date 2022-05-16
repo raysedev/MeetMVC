@@ -30,9 +30,8 @@ namespace MeetMVC.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
             _unitOfWork = unitOfWork;
         }
-
+        public string Image { get; set; }
         public string Username { get; set; }
-        public string ImagePath { get; set; }
 
         [TempData]
         public string StatusMessage { get; set; }
@@ -53,6 +52,7 @@ namespace MeetMVC.Areas.Identity.Pages.Account.Manage
             public string Country { get; set; }
             public string Age { get; set; }
             public string About { get; set; }
+            public string ImagePath { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -70,7 +70,8 @@ namespace MeetMVC.Areas.Identity.Pages.Account.Manage
                 City = user.City,
                 Country = user.Country,
                 Age = user.Age,
-                About = user.About
+                About = user.About,
+                ImagePath = user.ImagePath
             };
         }
 
@@ -82,7 +83,7 @@ namespace MeetMVC.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            ImagePath = user.ImagePath;
+            Image = user.ImagePath;
 
             await LoadAsync(user);
             return Page();
@@ -100,7 +101,6 @@ namespace MeetMVC.Areas.Identity.Pages.Account.Manage
 
             if (!ModelState.IsValid)
             {
-                _unitOfWork.UploadImage(file);
                 await LoadAsync(user);
                 return Page();
             }
@@ -149,6 +149,13 @@ namespace MeetMVC.Areas.Identity.Pages.Account.Manage
             if (Input.About != "")
             {
                 user.About = Input.About;
+                await _userManager.UpdateAsync(user);
+            }
+
+            if (Input.ImagePath != "")
+            {
+                user.ImagePath = Input.ImagePath;
+                _unitOfWork.UploadImage(file);
                 await _userManager.UpdateAsync(user);
             }
 
